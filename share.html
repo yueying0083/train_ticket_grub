@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>My Niubility</title>
+<meta http-equiv="Access-Control-Allow-Origin" content="*">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="format-detection" content="telephone=no">
+<style>
+body{background:#3e4bd5; width: 100%;margin: 0 auto; font-family:Helvetica; font-size: 15px;-webkit-user-select:none}
+*{color:#040000}
+.global_bg{width: 100%;background: url(./image/grub_share_bg.png);z-index: 100}
+.niubility{width:100%;margin-top:30px}
+
+#ticket_info{width:94%;padding: 3% 3% 0 3%;height: auto}
+#train_info{width:100%;background: #272f84; border-top-left-radius: 8px;border-top-right-radius: 8px;height: 40px}
+#train_no{width: 80px;height: 40px;line-height: 46px;color: #ffffff; margin-left: 10px;font-size: 1.2em;}
+#train_date{width: 170px;height: 40px;line-height: 46px;color: #ffffff; margin-right: 10px;font-size: 1.2em;text-align: right;float: right}
+#depart_arrive_info{width:100%;height: auto;background: #ffffff;background-image:url('./image/arrow_black.png');background-repeat: no-repeat;background-position: center center;background-size: 63px 10px;display: -webkit-box;display: -moz-box;display: box}
+#depart_info{-webkit-box-orient: horizontal;-moz-box-orient: horizontal;box-orient: horizontal;width:44%;height: auto;text-align:left;margin-left: 6%;margin-top: 20px}
+#depart_city{font-size: 2em;text-align: left;text-overflow: ellipsis;font-weight: bold;margin-right: -3px;color:#040000}
+#depart_time{font-size: 1.4em;text-align: left top;line-height: 34px;color:#040000}
+#arrive_info{-webkit-box-orient: horizontal;-moz-box-orient: horizontal;box-orient: horizontal;width:45%;height: auto;text-align: right;margin-top: 20px;margin-right: 5%}
+#arrive_city{font-size: 2em;text-align: right;text-overflow: ellipsis;white-space:nowrap; overflow:hidden;font-weight: bold;color:#040000}
+#arrive_time{font-size: 1.4em;text-align: right top;line-height: 34px;margin-right: 4px;color:#040000}
+#passengers{background: #ffffff;height:auto;width: 100%;height: auto;padding-top: 7px}
+.passenger{width:100%;height: auto;display: -webkit-box;display: -moz-box;display: box}
+.passenger-name{-webkit-box-orient: horizontal;-moz-box-orient: horizontal;box-orient: horizontal;width:24%;margin-left: 6%}
+.passenger-seat-code{-webkit-box-orient: horizontal;-moz-box-orient: horizontal;box-orient: horizontal;width:40%;text-align: center}
+.passenger-seat-type{-webkit-box-orient: horizontal;-moz-box-orient: horizontal;box-orient: horizontal;width:24%;margin-right: 6%;text-align: right}
+#ticket_info_end{background: #ffffff;height:auto;width: 100%;border-bottom-left-radius: 8px;border-bottom-right-radius: 8px;padding-bottom: 10px}
+
+.bottom_bg{background: url('./image/bottom_bg.png');width:100%;height:auto;position:relative;background-size: 80%;background-repeat: no-repeat;margin-top: -30px;z-index: -1;padding-top: 50px}
+.bottom_bg font{color:#ffffff;margin-left: 4%;margin-right: 4%;width: 92%;font-size: 1.1em;font-family: sans-serif;line-height: 1.2em;font-family: fantasy}
+
+.download-link{width:75%;margin: 30px 12% 30px 13%}
+.download-link:active{width:75%;margin: 30px 12% 30px 13%;background: #b3b3b3}
+span{display:none}
+</style>
+<script type="text/javascript" src="../../js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="../js/native-api.js"></script>
+<script type="text/javascript" src="./js/native-address.js"></script>
+</head>
+<body>
+	<div class="global_bg"></div>
+	<img src="./image/niubility.png" class='niubility'/>
+	
+	<div id="ticket_info">
+		<div id="train_info">
+			<font id="train_no"></font>
+			<font id="train_date"></font>
+		</div>
+		<div id="depart_arrive_info">
+			<div id="depart_info">
+				<font id="depart_city"></font>
+				<br/>
+				<font id="depart_time"></font>
+			</div>
+			<div id="arrive_info">
+				<font id="arrive_city"></font>
+				<br/>
+				<font id="arrive_time"></font>
+			</div>
+		</div>
+		<div id="passengers">
+		</div>
+		<div id="ticket_info_end"></div>
+	</div>
+	<div class="bottom_bg">
+		<font>抢票难度：<font id="grub_level" style="color: #fed136"></font></font><br/>
+		<font>抢票历时：<font id="grub_cost">12天2小时36分钟</font></font><br/>
+		<font>幸运指数：<font id="grub_luck" style="color: #fed136"></font></font><br/><br/>
+		<font>天下武功，唯快不破！</font><br/>
+		<font>高铁管家全自动抢票，闪电出击！</font><br/>
+		<div style="height: 150px"></div>
+	</div>
+	<a href='http://a.app.qq.com/o/simple.jsp?pkgname=com.gtgj.view' style="bottom: 0;position: fixed"><img class="download-link" src="./image/download_icon.png" /></a>
+	<div style="display: none" id="hidden_passenger">
+		<div class="passenger">
+			<div class="passenger-name">_passenger_name_</div>
+			<div class="passenger-seat-code">_seat_code_</div>
+			<div class="passenger-seat-type">_seat_name_</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		function GetRequest() { 
+			var url = location.search;
+			var theRequest = new Object(); 
+			if (url.indexOf("?") != -1) { 
+				var str = url.substr(1); 
+				strs = str.split("&"); 
+				for(var i = 0; i < strs.length; i ++) { 
+					theRequest[strs[i].split("=")[0]]=decodeURIComponent(strs[i].split("=")[1]); 
+				} 
+			}
+			return theRequest; 
+		}
+		$(function(){
+			$.ajax({
+				url : window.GTGJ.location + "qporder/share.action",
+				type: "POST",
+				dataType : "json",
+				data : {
+					"oid": GetRequest()['oid']
+				},
+				success: function(data){
+					SetValue("train_no", data.train_no);
+					SetValue("train_date", data.train_date);
+					SetValue("depart_city", data.depart_city);
+					SetValue("depart_time", data.depart_time);
+					SetValue("arrive_city", data.arrive_city);
+					SetValue("arrive_time", data.arrive_time);
+					
+					var i = 0, l = data.passengers.length, inner = '';
+					for(; i < l; i++){
+						var html = document.getElementById('hidden_passenger').innerHTML;
+						html = html.replace(/_passenger_name_/, data.passengers[i].passenger_name);
+						html = html.replace(/_seat_code_/, data.passengers[i].passenger_seat);
+						html = html.replace(/_seat_name_/, data.passengers[i].passenger_seat_type);
+						inner += html;
+					}
+					SetValue('passengers', inner);
+					SetValue('grub_level', BuildLevelStar(data.hard_level));
+					SetValue('grub_cost', data.exp_time);
+					SetValue('grub_luck', BuildLevelStar(data.lucky_level));
+				},
+				error: function(xhr, type, exception){
+					alert("网络请求出现错误");
+				},
+				waitTime: 30000
+			});
+			function SetValue(item, value){
+				document.getElementById(item).innerHTML=value;
+			}
+			function BuildLevelStar(level){
+				var str = '', i = 0;
+				for(;i<level;i++){
+					str+='★';
+				}
+				return str;
+			}
+			NativeAPI.invoke("updateHeaderRightBtn", {"text":"分享", "action":"show", "data":""}, function(err, data){});
+			NativeAPI.registerHandler("headerRightBtnClick", function(err, data){
+		    	NativeAPI.invoke('sharePage', {'title':'My Niubility(春运抢票全靠气质)','desc':'','link':'https://jt.rsscc.com/gtgjwap/app/grub/share.html?oid=' + GetRequest()['oid'], 'type': 'weixin,pengyouquan','imgUrl':'https://jt.rsscc.com/gtgjwap/app/grub/image/share_icon.png'}, function(err, data){});
+			});
+		});
+	</script>
+	<div style="display: none">
+	<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1257877395'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/z_stat.php%3Fid%3D1257877395' type='text/javascript'%3E%3C/script%3E"));</script>
+	</div>
+</body>
+</html>

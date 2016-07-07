@@ -1,0 +1,304 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+<meta http-equiv="Access-Control-Allow-Origin" content="*">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="format-detection" content="telephone=no">
+<title>添加抢票</title>
+<script type="text/javascript" src="../../js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="../js/native-api.js"></script>
+<script type="text/javascript" src="./js/native-address.js"></script>
+<script type="text/javascript">
+	Date.prototype.pattern=function(fmt) {
+	    var o = {
+		    "M+" : this.getMonth()+1, //月份
+		    "d+" : this.getDate(), //日
+		    "h+" : this.getHours()%12 == 0 ? 12 : this.getHours()%12, //小时
+		    "H+" : this.getHours(), //小时
+		    "m+" : this.getMinutes(), //分
+		    "s+" : this.getSeconds(), //秒
+		    "q+" : Math.floor((this.getMonth()+3)/3), //季度
+		    "S" : this.getMilliseconds() //毫秒
+	    };
+	    var week = {"1":"一","2":"二","3":"三","4":"四","5":"五","6":"六","0":"日"};
+	    if(/(y+)/.test(fmt)){
+	        fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+	    }
+	    if(/(E+)/.test(fmt)){
+	        fmt=fmt.replace(RegExp.$1, ((RegExp.$1.length>1) ? (RegExp.$1.length>2 ? "星期" : "周") : "")+week[this.getDay()+""]);
+	    }
+	    for(var k in o){
+	        if(new RegExp("("+ k +")").test(fmt)){
+				fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+	        }
+	    }
+	    return fmt;
+	}
+	function proccessYpInfo2(ypinfo){
+		var seats = {"0":"棚车","1":"硬座","2":"软座","3":"硬卧","4":"软卧","5":"包厢硬卧","6":"高级软卧","7":"一等软座","8":"二等软座","9":"商务座","A":"高级动卧","B":"混编硬座","C":"混编硬卧","D":"包厢软座","E":"特等软座","F":"动卧","G":"二人软包","H":"一人软包","I":"一等双软","J":"二等双软","K":"混编软座","L":"混编软卧","M":"一等座","O":"二等座","P":"特等座","Q":"观光座","S":"一等包座"};
+		var arrayLength = ypinfo.length / 10;
+		var qt = 0;
+		var list = [];
+		var i = 0, m = 6, n = 10, x = 0, y = 1
+		var dw = undefined;//动卧
+		for (; i < arrayLength; i++, m = m + 10, n = n + 10, x = x + 10, y = y + 10) {
+		    var model = {};
+		    model.code = ypinfo.substring(x, y);
+		    if (parseInt(ypinfo.substring(m, m + 1), 10) >= 3) {
+		        model.name = "无座";
+		        model.remain = parseInt(ypinfo.substring(m + 1, n), 10);
+		        model.price = parseInt(ypinfo.substring(y, m), 10) / 10;
+		    } else {
+		        model.name = seats[model.code];
+		        model.remain = parseInt(ypinfo.substring(m, n), 10);
+		        model.price = parseInt(ypinfo.substring(y, m), 10) / 10;
+		        model.price = model.name.indexOf('卧') != -1 ? parseInt(model.price * 1.2) : model.price;
+				if(model.code == '4' || model.code == 'F'){
+					dw = {};
+					dw.code = model.code;
+			        dw.remain = model.remain;
+			        dw.price = model.price;
+					dw.name = "动卧";
+				}
+		    }
+		    list[i] = model;
+		}
+		if(dw){
+			list[list.length] = dw;
+		}
+		return list;
+	}
+	$(function() {
+		document.body.addEventListener('touchstart', function () {});
+		var LG = window.LG || {};
+		window.LG = LG;
+		LG.Init=function(){
+			NativeAPI.invoke('gtgjGetCurrentTrains', {}, function(err, data){
+				if(data && data.trains){
+					LG.DepartCode = data.departCode;
+					LG.ArriveCode = data.arriveCode;
+					LG.DepartName = data.departName;
+					LG.ArriveName = data.arriveName;
+					LG.DepartDate.Choice = data.departDate;
+					LG.Selections=data.trains;
+					$("#grub_line").html(data.departName + " 至 " + data.arriveName);
+					LG.Seats.Init();
+					LG.DepartDate.Init();
+					LG.DepartTime.Init();
+					LG.Trains.Init();
+					NativeAPI.invoke("loading", {"show":"0","text":""}, function(err, data) {});
+				}
+			});
+		}
+		
+		// 可供选择的席别
+		LG.Seats={};
+		LG.Seats.Init=function(){
+			LG.Seats.Selections=["二等座","硬座","硬卧","软卧","一等座","软座","高级软座","高级软卧","商务座","特等座"];
+			LG.Seats.Checked=["二等座","硬座"];
+			LG.Seats.UpdateDisplay();
+		};
+		LG.Seats.Clicker=function(){
+			NativeAPI.invoke('multiSelect', {'selections':LG.Seats.Selections, 'checked':LG.Seats.Checked, 'title':'请选择接受的席别'}, 
+				function(err, data) {
+					if(data && data.checked){
+						LG.Seats.Checked=data.checked;
+						LG.Seats.UpdateDisplay();
+						LG.Trains.UpdateDisplay();
+					}
+				}
+			);
+		};
+		LG.Seats.UpdateDisplay=function(){
+			$("#grub_seat").html(LG.Seats.Checked.join("、"));
+		};
+
+		// 出发日期选择		
+		LG.DepartDate={};
+		LG.DepartDate.Init=function(){
+			var today = new Date();
+			LG.DepartDate.Min = today.pattern('yyyy-MM-dd');
+			LG.DepartDate.Max = new Date(today.getTime() + 60 * 24 * 60 * 60 * 1000).pattern('yyyy-MM-dd');
+			LG.DepartDate.UpdateDisplay();
+		};
+		LG.DepartDate.UpdateDisplay=function(){
+			$("#grub_depart_date").html(LG.DepartDate.Choice);
+		};
+		LG.DepartDate.Clicker=function(){
+			NativeAPI.invoke('selectDate', {'min':LG.DepartDate.Min, 'max':LG.DepartDate.Max, 'current':LG.DepartDate.Choice}, 
+				function(err, data) {
+					if(data && data.value){
+						LG.DepartDate.Choice = data.value;
+						LG.DepartDate.UpdateDisplay();
+						NativeAPI.invoke('gtgjExecuteTask', {'action':'query_tickets', 'server':'tt', 'waitenable':true, 'waitdesc':'正在更新车次信息...', 
+							'input':{'queryFromStationCode':LG.DepartCode, 'queryToStationCode': LG.ArriveCode,
+							'queryFromStationName':LG.DepartName, 'queryToStationName': LG.ArriveName, 'queryTrainDate': LG.DepartDate.Choice}}
+							, function(err, data){
+								if(data){
+									LG.Selections = data.datas;
+									LG.Trains.UpdateDisplay();
+								}
+							}
+						);
+					}
+				}
+			);
+		};
+		
+		// 出发时间段选择
+		LG.DepartTime={};
+		LG.DepartTime.Init=function(){
+			LG.DepartTime.Selections=[];
+			var i = 0;
+			for(; i < 24; i++){
+				var key = i + "";
+				key = ("00" + key).substring(key.length) + ":00";
+				var selection={};
+				selection[key] = [];
+				var j = i + 1;
+				var k = 0;
+				for(; j <= 24; j++){
+					var value = j + "";
+					value = ("00" + value).substring(value.length) + ":00";
+					selection[key][k++] = value;
+				}
+				LG.DepartTime.Selections[i]=selection;
+			}
+			LG.DepartTime.Choice={'left':'00:00', 'right':'24:00'};
+			LG.DepartTime.UpdateDisplay();
+		};
+		LG.DepartTime.UpdateDisplay=function(){
+			$("#grub_depart_time").html(LG.DepartTime.Choice.left + " ~ " + LG.DepartTime.Choice.right);
+		};
+		LG.DepartTime.Clicker=function(){
+			NativeAPI.invoke("gtgjHandleBusiness",{"obj":"grub","command":"time_select","input":{'data':LG.DepartTime.Selections, 'left':LG.DepartTime.Choice.left, 'right':LG.DepartTime.Choice.right}}, 
+				function(err, data) {
+					if(data && data.left && data.right){
+						LG.DepartTime.Choice.left = data.left;
+						LG.DepartTime.Choice.right = data.right;
+						LG.DepartTime.UpdateDisplay();
+						LG.Trains.UpdateDisplay();
+					}
+				}
+			);
+		};
+		
+		// 线路
+		LG.Trains={};
+		LG.Trains.Init=function(){
+			LG.Trains.Choice=[];
+			NativeAPI.invoke('gtgjExecuteTask', {'action':'query_tickets', 'server':'tt', 'waitenable':true, 'waitdesc':'正在更新车次信息...', 
+				'input':{'queryFromStationCode':LG.DepartCode, 'queryToStationCode': LG.ArriveCode,
+				'queryFromStationName':LG.DepartName, 'queryToStationName': LG.ArriveName, 'queryTrainDate': LG.DepartDate.Choice}}
+				, function(err, data){
+					if(data){
+						LG.Selections = data.datas;
+						LG.Trains.UpdateDisplay();
+					}
+				}
+			);
+		};
+		LG.Trains.UpdateDisplay=function(){
+			var count = 0;
+			LG.Trains.Choice=[];
+			$.each(LG.Selections, function(i, m){
+				var departTime = m.departTime ? m.departTime : m.departtime;
+				var yp_info = m.yp_info ? m.yp_info : m.ypinfo;
+				
+				// 时间段在之内
+				if(departTime < LG.DepartTime.Choice.left || departTime > LG.DepartTime.Choice.right){
+					return true;// continue;
+				}
+				
+				
+				var j = 0;
+				var found = false;
+				$.each(proccessYpInfo2(yp_info), function(j, seat){
+					$.each(LG.Seats.Checked, function(p, name){
+						if(seat.name == name){
+							found = true;
+							return false;
+						}
+					});
+					if(found){
+						return false;
+					}
+				});
+				if(found){
+					LG.Trains.Choice[count++] = m;
+				}
+			});
+			$("#grub_train_count").html("共" + LG.Trains.Choice.length + "趟");
+		};
+		
+		LG.Submit=function(){
+			var grubInfo = {'trains': LG.Trains.Choice, 'depart_date': LG.DepartDate.Choice, 'depart_time_area': LG.DepartTime.Choice, 'seats': LG.Seats.Checked,
+				'depart_code': LG.DepartCode, 'depart_name': LG.DepartName, 'arrive_code': LG.ArriveCode, 'arrive_name': LG.ArriveName};
+			
+			NativeAPI.invoke("storage",{action:"set",key:"line_grub",value:JSON.stringify(grubInfo)}, function(err, data){
+				var location_url = window.location.href;
+				var end_index = location_url.indexOf('gtgjwap');
+				var url = location_url.substring(0, end_index) + "gtgjwap/app/grub/line_grub_2.html";
+				NativeAPI.invoke("createWebView", {"url":url}, function(e, d){});
+			});
+		}
+		
+		$("#grub_seat_area").bind('click', LG.Seats.Clicker);
+		$("#grub_depart_date_area").bind('click', LG.DepartDate.Clicker);
+		$("#grub_depart_time_area").bind('click', LG.DepartTime.Clicker);
+		$("#submit_box").bind('click', LG.Submit);
+		LG.Init();
+	});
+</script>
+<style>
+body{background:#f3f3f3; width: 100%;margin: 0 auto; font-family:Avenir; font-size: 1.1em;-webkit-user-select:none}
+*{color:#333333}
+.divide{background: #eeeeee;height: 1px;width: 97%; overflow:hidden;margin: 0px 0px 0px 3%}
+
+.clickable{background: #ffffff;background-image: url(./image/arrow_right.png);background-repeat: no-repeat;background-position: 97% center;background-size: 7px 12px}
+.clickable:active{background: #d3d7dc;background-image: url(./image/arrow_right.png);background-repeat: no-repeat;background-position: 97% center;background-size: 7px 12px}
+
+.single_line{width:100%;float: left;height: 2.6em;line-height: 2.6em;display: -webkit-box;display: -moz-box;display: box;position: relative;vertical-align: middle}
+.single_line_sub{-webkit-box-orient: horizontal;-moz-box-orient: horizontal;box-orient: horizontal}
+
+.grub_item_title{width: 30%;color: #a3a3a3;padding: 0 0 0 3%}
+.grub_item_content{width: 64%;text-align: right;padding: 0 3% 0 0}
+.clickarrow .grub_item_content{width: 61%;text-align: right;padding: 0 6% 0 0}
+
+.submit_button{background: #f39800; font-size:1.3em;height:1.8em;width:90%; border-radius: 6px; border: 0px;color: white;float: right;line-height: 1.8em;margin: 5px 5% 20px 5%;text-align: center;position: fixed;bottom: 0px;z-index: 1995}
+.submit_button:active{background: #e08c00; color:#d3d7dc}
+</style>
+</head>
+<body>
+	<div style="background: #ffffff;width: 100%;float: left; height: auto">
+		<div class="single_line">
+			<div class="single_line_sub grub_item_title">线路</div>
+			<div id="grub_line" class="single_line_sub grub_item_content"></div>
+		</div>
+		<div class="divide"></div>
+		<div class="single_line clickable clickarrow" id="grub_seat_area">
+			<div class="single_line_sub grub_item_title">修改席别</div>
+			<div class="single_line_sub grub_item_content" id="grub_seat"></div>
+		</div>
+		<div class="divide"></div>
+		<div class="single_line clickarrow clickable" id="grub_depart_date_area">
+			<div class="single_line_sub grub_item_title">出发日期</div>
+			<div class="single_line_sub grub_item_content" id="grub_depart_date"></div>
+		</div>
+		<div class="divide"></div>
+		<div class="single_line clickable clickarrow" id="grub_depart_time_area">
+			<div class="single_line_sub grub_item_title">发车时间段</div>
+			<div class="single_line_sub grub_item_content" id="grub_depart_time"></div>
+		</div>
+		<div class="divide"></div>
+		<div class="single_line clickable clickarrow" id="grub_train_count_area">
+			<div class="single_line_sub grub_item_title">可抢车次</div>
+			<div class="single_line_sub grub_item_content" id="grub_train_count"></div>
+		</div>
+	</div>
+	
+	<div id="submit_box" class="submit_button">下一步</div>
+</body>
+</html>

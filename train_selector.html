@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Access-Control-Allow-Origin" content="*">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>车次选择</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="format-detection" content="telephone=no">
+<style>
+body{background:#ffffff; width: 100%;margin: 0 auto; font-family:Helvetica; font-size: 15px;-webkit-user-select:none}
+*{color:#333333;font-family:"宋体"}
+
+#train_list{background: #ffffff;height:auto;float:left;width: 100%;height: auto}
+.train_info{width:100%;float: left;height: 69px;padding-top: 5px;height:auto;display: -webkit-box;display: -moz-box;display: box}
+.train_info:active{background: #e3e3e3}
+.train_info div{-webkit-box-orient: horizontal;-moz-box-orient: horizontal;box-orient: horizontal}
+.train_info div .v{width:100%;float: left;font-size: 1.1em;line-height: 1.5em;text-align: left}
+.train_time_info{width:29%;margin-left: 5%}
+.train_station_info{width:25%;padding: 0 2% 0 2%}
+.train_price_info{width:22%;padding: 0 2% 0 2%}
+.train_check_info{width:5%;margin-right: 2%;padding: 0 2% 0 2%}
+.iconable{padding-left: 20px}
+.last_time{background: url(./image/time01.png);background-repeat: no-repeat;background-position: 0 50%;background-size: 17px 17px}
+.station_start{background: url(./image/station_start.png);background-repeat: no-repeat;background-position: 0 50%;background-size: 17px 17px}
+.station_end{background: url(./image/station_end.png);background-repeat: no-repeat;background-position: 0 50%;background-size: 17px 17px}
+.no_ticket{border-radius: .3em;color:#ffffff;padding: 0.1em 0.2em 0.1em 0.2em;background: #fdac5a;font-size: 0.7em}
+
+.item_selected{background-image: url(./image/checkbox_selected.png);background-repeat: no-repeat;background-position: 50% center;background-size: 22px 22px}
+.item_selected:active{background-image: url(./image/checkbox_selected.png);background-repeat: no-repeat;background-position: 50% center;background-size: 22px 22px}
+.item_unselected{background-image: url(./image/checkbox_unselected.png);background-repeat: no-repeat;background-position: 50% center;background-size: 22px 22px}
+.item_unselected:active{background-image: url(./image/checkbox_unselected.png);background-repeat: no-repeat;background-position: 50% center;background-size: 22px 22px}
+
+.divide{background: #e3e3e3;height: 1px;width: 100%; overflow:hidden;-webkit-transform: scaleY(0.5)}
+
+.info{padding: 8px 4% 8px 4%;font-size: 0.9em;background: #fcfcd7;color:#484938;top:0px;position:fixed;width:100%}
+.blue{background: #1596ef;width: 100%;height:50px;position:fixed ;bottom:0px;color:#ffffff;font-size: 20px;vertical-align: middle;text-align: center;line-height: 50px}
+.blue:active{background: #1959A6; color:#d3d7dc}
+</style>
+<script type="text/javascript" src="../../js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="../js/native-api.js"></script>
+<script type="text/javascript" src="./js/native-address.js"></script>
+<script type="text/javascript">
+	$(function(){
+		NativeAPI.invoke("storage",{action:"get",key:"gtgj_grub_trains"},function(err,data){
+			window.TrainData = JSON.parse(data.value);
+			if(window.TrainData){
+				var count = 0;					
+				$.each(window.TrainData, function(i, m){
+					var template = $("#train_info_template").html();
+					template = template.replace(/_train_code_/, m.trainno);
+					template = template.replace(/_train_depart_time_/, m.departtime);
+					template = template.replace(/_train_arrive_time_/, m.arrivetime);
+
+					template = template.replace(/_train_depart_name_/, m.departname);
+					if(m.departimage == "1"){
+						template = template.replace(/_station_start_/, 'station_start');
+					}
+					template = template.replace(/_train_arrive_name_/, m.arrivename);
+					if(m.arriveimage == "1"){
+						template = template.replace(/_station_end_/, 'station_end');
+					}
+					template = template.replace(/_train_time_/, m.traveltime);
+					
+					template = template.replace(/_train_price_/, "￥" + parseFloat(m.price).toFixed(2));
+					template = template.replace(/_train_seat_/, m.name);
+					
+					var remain = parseInt(m.remain);
+					
+					if(remain == 0){
+						template = template.replace(/_train_remain_/, '无票');
+						template = template.replace(/_no_ticket_/, 'no_ticket');
+					}else{
+						template = template.replace(/_train_remain_/, m.remain + '张');
+					}
+					
+					
+					template = template.replace(/_train_checker_/, m.check ? 'item_selected' : 'item_unselected');
+					m.check ? count++ : '';
+					template = template.replace(/_index_/, i);
+					$("#train_list").append(template);
+				});
+				$("#total_count").html(count);
+				
+				$("#train_list").delegate("div[class='train_info']", 'click', function(){					
+					var checker = $($(this).find("div[name='checker']")[0]);
+					
+					var index = parseInt(checker.attr('index'));
+					if(window.TrainData[index].check){
+						checker.addClass('item_unselected');
+						checker.removeClass('item_selected');
+						window.TrainData[index].check = false;
+					}else{
+						checker.addClass('item_selected');
+						checker.removeClass('item_unselected');
+						window.TrainData[index].check = true;
+					}
+					var count = 0;					
+					$.each(window.TrainData, function(i, m){
+						m.check ? count++ : '';
+					});
+					$("#total_count").html(count);
+				});
+				
+				$("#submit_box").bind('click', function(){
+					NativeAPI.invoke("storage",{action:"set",key:"gtgj_grub_trains",value:JSON.stringify(window.TrainData)},function(err,data){});
+					NativeAPI.invoke('close');
+				});
+				
+				window.selectAll = false;
+		    	NativeAPI.invoke("updateHeaderRightBtn", {"text":"全选", "action":"show", "data":""}, function(err, data){});
+		    	NativeAPI.registerHandler("headerRightBtnClick", function(err, data){
+			    	
+			    	var clickers = $("#train_list").find("div[class='train_info']");
+			    	$.each(clickers, function(i, m){
+				    	var checker = $($(m).find("div[name='checker']")[0]);
+						var index = parseInt(checker.attr('index'));
+						checker.removeClass('item_selected');
+						checker.removeClass('item_unselected');
+						
+				    	if(window.selectAll){					    	
+							checker.addClass('item_unselected');
+							window.TrainData[index].check = false;
+							$("#total_count").html('0');
+							NativeAPI.invoke("updateHeaderRightBtn", {"text":"全选", "action":"show", "data":""}, function(err, data){});
+				    	}else{
+							checker.addClass('item_selected');
+							window.TrainData[index].check = true;
+							$("#total_count").html(window.TrainData.length);
+							NativeAPI.invoke("updateHeaderRightBtn", {"text":"取消全选", "action":"show", "data":""}, function(err, data){});
+				    	}
+				    	
+					
+			    	});
+			    	window.selectAll = !window.selectAll;
+		    	});
+			}
+		});
+	});
+</script>
+</head>
+<body>
+	<div class="info">已选<font id="total_count" style="color:#f37800"></font>辆车次，车次越多，抢到几率越大。</div>
+	<div style="height:40px;float:left">&nbsp;</div>
+	<div class="divide"></div>
+	<div id="train_list">
+	</div>
+	<div style="display: none" id="train_info_template">
+		<div class="train_info">
+			<div class="train_time_info">
+				<div class="v">_train_code_</div>
+				<div class="v" style="color: #4b8bd8;font-weight: bold;font-size: 1.2em">_train_depart_time_</div>
+				<div class="v" style="font-weight: 200">_train_arrive_time_</div>
+			</div>
+			<div class="train_station_info">
+				<div class="v iconable last_time">_train_time_</div>
+				<div class="v iconable _station_start_">_train_depart_name_</div>
+				<div class="v iconable _station_end_">_train_arrive_name_</div>
+			</div>
+			<div class="train_price_info">
+				<div class="v" style="color: #fcab5a;font-weight: 300;text-align: right">_train_price_</div>
+				<div class="v" style="text-align: right">_train_seat_</div>
+				<div class="v" style="text-align: right"><font class='_no_ticket_'>_train_remain_</font></div>
+			</div>
+			<div class="train_check_info _train_checker_" name="checker" index='_index_'></div>
+		</div>
+		<div class="divide"></div>
+	</div>
+	<div style="height:60px;float:left">&nbsp;</div>
+	<div id="submit_box" class="blue">确定</div>
+</body></html>

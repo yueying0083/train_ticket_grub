@@ -1,0 +1,122 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+<meta http-equiv="Access-Control-Allow-Origin" content="*">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="format-detection" content="telephone=no">
+<title>红包返现</title>
+<script type="text/javascript" src="../../js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="../js/native-api.js"></script>
+<script type="text/javascript" src="./js/native-address.js"></script>
+<script type="text/javascript">
+	$(function() {
+		window.selectedCouponId = '';
+		NativeAPI.invoke("storage",{action:"get",key:"gtgj_coupons"},function(err,data){
+			if(data && data.value && data.value.length > 0){
+				window.coupons = JSON.parse(data.value);
+				NativeAPI.invoke("storage",{action:"get",key:"gtgj_coupon_id"},function(err,data){
+					if(data.value){
+						window.selectedCouponId = data.value;
+					}
+				
+					$.each(window.coupons, function(i, m){
+						var template = $("#coupon_hidden").html();
+						template = template.replace(/_coupon_id_/, m.id);
+						template = template.replace(/_coupon_title_/, m.t);
+						template = template.replace(/_coupon_expiry_date_/, m.dt);
+						template = template.replace(/_coupon_desc_1_/, m.c1);
+						template = template.replace(/_coupon_desc_2_/, m.c2);
+						template = template.replace(/_coupon_before_amount_/, m.ba);
+						template = template.replace(/_coupon_amount_/, m.a);
+						template = template.replace(/_coupon_after_amount_/, m.aa);
+						template = template.replace(/_coupon_checked_/, window.selectedCouponId == m.id ? 'coupon_desc_choise_ckecked' : 'coupon_desc_choise_unckecked');
+						$("#coupons").append(template);
+					});
+					
+					$("div[name='coupon']").bind('click', function(){
+						if(window.selectedCouponId == $(this).attr("id")){
+							window.selectedCouponId = '';
+							$.each($("div[name='coupon']"), function(i, m){
+								var checker = $(this).find("div[name=checker]");
+								checker.removeClass('coupon_desc_choise_ckecked');
+								checker.removeClass('coupon_desc_choise_unckecked');
+								checker.addClass('coupon_desc_choise_unckecked');
+							});
+						}else{
+							window.selectedCouponId = $(this).attr("id");
+							$.each($("div[name='coupon']"), function(i, m){
+								var checker = $(this).find("div[name=checker]");
+								if(window.selectedCouponId == $(this).attr("id")){
+									checker.removeClass('coupon_desc_choise_ckecked');
+									checker.removeClass('coupon_desc_choise_unckecked');
+									checker.addClass('coupon_desc_choise_ckecked');
+								}else{
+									checker.removeClass('coupon_desc_choise_ckecked');
+									checker.removeClass('coupon_desc_choise_unckecked');
+									checker.addClass('coupon_desc_choise_unckecked');
+								}
+							});
+						}
+					});
+					
+					NativeAPI.invoke("updateHeaderRightBtn", {"text":"确定", "action":"show", "data":""}, function(err, data){});
+					NativeAPI.registerHandler("headerRightBtnClick", function(err, data){
+						NativeAPI.invoke("storage",{action:"set",key:"gtgj_coupon_id",value:window.selectedCouponId},function(err,data){});
+						NativeAPI.invoke('close');
+					});
+				});
+			}
+		});
+	});
+</script>
+<style>
+body{background:#f3f3f3; width: 100%;margin: 0 auto; font-family:Avenir; font-size: 1.1em;-webkit-user-select:none}
+*{color:#333333}
+.notice_top{padding: 0.5em 0 0.5em 2em;font-size: 0.9em;background: #fcfcd7;color:#484938;background-image: url('image/icon_gt_light.png');background-position: 0.59375em 50%;background-repeat: no-repeat;background-size: 1.1875em 1.6875em}
+
+.coupon{width:100%;float: left;height: 10em;margin-top: 5px;height:6.375em;display: -webkit-box;display: -moz-box;display: box;position: relative;background: #f3f3f3}
+.coupon_info{-webkit-box-orient: horizontal;-moz-box-orient: horizontal;box-orient: horizontal}
+.coupon_left{background-image: url('image/gt_coupon_left_bg.png');background-size: 13px 6.375em;background-position: 100% 0;background-repeat: no-repeat;width: 6%;height: 6.375em}
+.coupon_title{width: 60%;height: 6.375em;background: #ffffff}
+.coupon_middle{width: 0.1em;height: 6.375em}
+.coupon_desc{width: 27%;height: 6.375em;background: #ffffff;background-image: url('image/coupon_train.png');background-repeat: no-repeat;background-size: 4.6em 4.6em;background-position: 95% 65%;text-align: right}
+.coupon_right{background-image: url('image/gt_coupon_right_bg.png');background-size: 13px 6.375em;background-position: 0 0;background-repeat: no-repeat;width: 5%;height: 6.375em}
+
+.coupon_content_sub{float:left; width:94%;color:#9A9A9A;font-size: 0.8em}
+.coupon_info_title{margin-top: 0.6em;font-size: 1em;color: #FF9000}
+
+.coupon_desc_amount_sub{font-size: 0.7em;color: #FF9000}
+.coupon_desc_amount{font-size: 1.6em;color: #FF9000}
+
+.coupon_desc_choise_ckecked{width:100%;background-image: url('image/checkbox_selected02.png');background-repeat: no-repeat;background-position: 100% 100%;background-size: 1.3125em 1.3125em;height: 2.7em}
+.coupon_desc_choise_unckecked{width:100%;background-image: url('image/checkbox_unselected02.png');background-repeat: no-repeat;background-position: 100% 100%;background-size: 1.3125em 1.3125em;height: 2.7em}
+</style>
+</head>
+<body>
+	<div class="notice_top" id="notice">使用红包抢票 -> 乘车后返现 -> 提现到支付宝<br/>( 注：返现不超过车票金额 )</div>
+	<div id="coupons"></div>
+	<div id="coupon_hidden" style="display: none">
+		<div name="coupon" class="coupon" id="_coupon_id_">
+			<div class="coupon_info coupon_left" desc="占位区域"></div>
+			<div class="coupon_info coupon_title coupon_content">
+				<span class="coupon_content_sub coupon_info_title">_coupon_title_</span>
+				<span class="coupon_content_sub">_coupon_expiry_date_</span>
+				<span class="coupon_content_sub" style="height: 0.6em">&nbsp;</span>
+				<span class="coupon_content_sub">_coupon_desc_1_</span>
+				<span class="coupon_content_sub">_coupon_desc_2_</span>
+			</div>
+			<div class="coupon_info coupon_middle" desc="占位区域"></div>
+			<div class="coupon_info coupon_desc">
+				<span class="coupon_content_sub">&nbsp;</span>
+				<span class="coupon_desc_amount_sub">_coupon_before_amount_</span>
+				<span class="coupon_desc_amount">_coupon_amount_</span>
+				<span class="coupon_desc_amount_sub">_coupon_after_amount_</span><br/>
+				<div class="_coupon_checked_" name="checker"></div>
+			</div>
+			<div class="coupon_info coupon_right" desc="占位区域"></div>
+		</div>
+	</div>
+</body>
+</html>

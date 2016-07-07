@@ -1,0 +1,70 @@
+<html>
+<head>
+<meta http-equiv="Access-Control-Allow-Origin" content="*">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>退款详情</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="format-detection" content="telephone=no">
+<style>
+body{background:#f3f3f3;-webkit-user-select:none}
+*{color:#333333}
+p{margin: 20px;text-indent: 2em;font-size: 1.2em}
+font{color: #ef730e}
+.alipay_normal{background: url(./image/alipay_normal.png);background-repeat: no-repeat;background-size: 144px 30px}
+.alipay_pressed{background: url(./image/alipay_pressed.png);background-repeat: no-repeat;background-size: 144px 30px}
+.wechat_normal{background: url(./image/wechat_normal.png);background-repeat: no-repeat;background-size: 144px 30px}
+.wechat_pressed{background: url(./image/wechat_pressed.png);background-repeat: no-repeat;background-size: 144px 30px}
+#alipay:active{background: url(./image/alipay_pressed.png);background-repeat: no-repeat;background-size: 144px 30px}
+#wechat:active{background: url(./image/wechat_pressed.png);background-repeat: no-repeat;background-size: 144px 30px}
+#wechat{}
+</style>
+<script type="text/javascript" src="../../js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript">
+$(function() {
+	document.body.addEventListener('touchstart', function () {}); 
+	window.paytype = 'alipay';
+	$("#alipay").bind('click', function(){
+		if(window.paytype == 'alipay'){
+			return;
+		}
+		$("#wechat").removeClass('wechat_pressed');
+		$("#wechat").addClass('wechat_normal');
+		$("#alipay").addClass('alipay_pressed');
+		$("#alipay").removeClass('alipay_normal');
+		$("#alipay_img").css('display', '');
+		$("#wechat_img").css('display', 'none');
+		window.paytype = 'alipay';
+	});
+	$("#wechat").bind('click', function(){
+		if(window.paytype == 'wechat'){
+			return;
+		}
+		$("#wechat").addClass('wechat_pressed');
+		$("#wechat").removeClass('wechat_normal');
+		$("#alipay").removeClass('alipay_pressed');
+		$("#alipay").addClass('alipay_normal');
+		$("#alipay_img").css('display', 'none');
+		$("#wechat_img").css('display', '');
+		window.paytype = 'wechat';
+	});
+});
+</script>
+</head>
+<body>
+
+<p>
+	小管用心帮您买票，但怎奈环境因素，你懂的，没帮您买到票，可钱已经付了<font>肿么办？</font>请放心，钱小管会原渠道退还给您。一般是在1~7个工作日。查询退款进度方法如下：
+</p>
+<div style="width:288px;height:30px;margin:10px auto 10px auto">
+<div id="alipay" class="alipay_pressed" style="width:144px;height:30px;float:left"></div>
+<div id="wechat" class="wechat_normal" style="width:144px;height:30px;float:left"></div>
+</div>
+
+<img id="alipay_img" src="./image/refund_note_alipay.jpg" style="width:100%;float:left"/>
+<img id="wechat_img" src="./image/refund_note_wechat.jpg" style="width:100%;float:left;display:none"/>
+<img src="./image/alipay_normal.png" style="display:none"/>
+<img src="./image/wechat_pressed.png" style="display:none"/>
+</body>
+</html>

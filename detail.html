@@ -1,0 +1,240 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+<meta http-equiv="Access-Control-Allow-Origin" content="*">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="format-detection" content="telephone=no">
+<title>抢票</title>
+<style>
+body{background:#ffffff; width: 100%;margin: 0 auto; font-family:Helvetica; -webkit-user-select:none}
+*{color:#333333}
+#ticket_info{width:94%;padding: 14px 3% 0 3%;height: auto;float:left}
+#train_info{width:100%;background: #4b8bd8; border-top-left-radius: 8px;border-top-right-radius: 8px;height: auto;float: left}
+#train_no{width: 30%; float: left;line-height: 2.125em;color: #ffffff; margin-left: 10px;font-size: 1.1875em;height: 2.125em}
+#train_date{width: 50%; float: right;line-height: 2.125em;color: #ffffff; margin-right: 10px;font-size: 1.1875em;text-align: right;height: 2.125em}
+
+#line_grub_train_info{width:100%;background: #4b8bd8; height: auto;float: left}
+#seat_types{width: 30%; float: left;line-height: 1.325em;color: #f3f3f3; margin-left: 10px;font-size: 0.8875em;height: 1.725em}
+#depart_times{width: 50%; float: right;line-height: 1.325em;color: #f3f3f3; margin-right: 10px;font-size: 0.8875em;text-align: right;height: 1.725em}
+
+#depart_arrive_info{width:100%;height: auto;background: #ffffff; float: left;background-image:url('./image/bluearrow.png');background-repeat: no-repeat;background-position: center center;background-size: 32px 22px}
+#depart_info{width:40%;height: auto;float: left;text-align:left;margin-left: 10px;margin-top: 10px}
+#depart_city{font-size: 1.875em;line-height: 1.1875em;text-align: left;text-overflow: ellipsis;font-weight: 900}
+#depart_time{font-size: 1.5625em;text-align: left top;font-weight: 500}
+#arrive_info{width:40%;height: auto;float: right;text-align: right;margin-top: 10px}
+#arrive_city{font-size: 1.875em;line-height: 1.1875em;text-align: right;margin-right: 7px;text-overflow: ellipsis;white-space:nowrap; overflow:hidden;font-weight: 900}
+#arrive_time{font-size: 1.5625em;text-align: right top;margin-right: 10px;font-weight: 500}
+
+#passengers{background: #ffffff;height:auto;float:left;width: 100%;height: auto;padding: 4px 0px 0px 0px}
+.passenger{width:100%;height: auto;float: left}
+.passenger_end{border-bottom-left-radius: 8px;border-bottom-right-radius: 8px}
+.passenger_info{width:45%;height: auto;float: left;text-align:left;margin-left: 12px}
+.passenger_name{font-size: 0.8125em;text-align: left}
+.passenger_type{font-size: 0.5em;text-align: left;margin-left:7px;color:#96969c}
+.passenger_id{font-size: 0.8125em;text-align: left;line-height: 1.3125em;}
+.seat_info{width:45%;height: auto;float: right;text-align: right;margin-right: 12px}
+.seat_type{font-size: 0.8125em;text-align: right;text-overflow: ellipsis;white-space:nowrap; overflow:hidden}
+.seat_price{font-size: 0.8125em;text-align: right;line-height: 1.3125em;color: #f39800}
+.not_adult_type{color:#2fa9e1}
+#grub_remain{background: #ffffff;height:auto;float:left;width: 100%}
+#grub_insurance{background: #ffffff;height:auto;float:left;width: 100%}
+#grub_multi_train{background: #ffffff;height:auto;float:left;width: 100%}
+.rise_up{background: #ffffff;height:2em;float:left;width: 100%}
+.rise_up_txt{width:80%;text-align:right;float:right;margin-right: 12px;white-space:nowrap; overflow:hidden; text-overflow:ellipsis;padding-right: 10px;color: #FFAD33;line-height: 1em;font-size: 0.8125em}
+.rise_up_img{background-image:url('./image/arrow_orange_right.png');background-repeat: no-repeat;background-position: right center;background-size: 5px 9px}
+.rise_up_txt:active{color:#d98e1e}
+
+#ticket_info_end{background: #ffffff;height:auto;float:left;width: 100%;border-bottom-left-radius: 8px;border-bottom-right-radius: 8px;padding-bottom: 10px}
+
+.hidden_area{display: none}
+.divide_up{background: #eeeeee;height: 1px;width: 100%; overflow:hidden;-webkit-transform: scaleY(0.5) rotate(180deg);float:left;margin-top: 20px}
+.divide{background: #eeeeee;height: 1px;width: 94%; overflow:hidden;margin: 0px 3% 0px 3%;-webkit-transform: scaleY(0.5)}
+.divide_1{background: #eeeeee;height: 1px;width: 96%; overflow:hidden;margin:0px 0px 0px auto}
+.money_label{font-size: 16px;}
+.money_value{color: #ff7200; font-size: 23px;}
+.money_value_1{color: #ff7200; font-size: 15px;}
+.blue{background: #4889db;width: 100%;height:50px;position:fixed ;bottom:0px;color:#ffffff;font-size: 20px;vertical-align: middle;text-align: center;line-height: 50px; z-index:102}
+.blue:active{background: #3e70ac; color:#d3d7dc}
+
+.yellow{background: #f39800;width: 100%;height:50px;position:fixed ;bottom:0px;color:#ffffff;font-size: 20px;vertical-align: middle;text-align: center;line-height: 50px; z-index:102}
+.yellow:active{background: #e08c00; color:#d3d7dc}
+.yellow font{color:#ffffff;font-size: 20px;vertical-align: middle;text-align: center;line-height: 50px;background: url(./image/share.png);background-size: 20px 18px;background-position: 0 50%;width: 100%;background-repeat: no-repeat}
+.hidden{display: none}
+
+#status{background: #ffffff;height:auto;float:left;height: auto;width:94%;padding: 0px 3% 0px 3%}
+.status{width:100%;float: left;height: auto;padding-top: 5px;height:auto;display: -webkit-box;display: -moz-box;display: box;background: url(./image/bg_long.png);background-repeat: repeat-y;background-position: 24px 0%;position: relative}
+.sub_status{-webkit-box-orient: horizontal;-moz-box-orient: horizontal;box-orient: horizontal;width: 24px}
+
+.status_date_time{width: 12px;height: auto}
+.status_date{width: auto;height: auto;line-height: 20px;font-size: 12px;text-align: center;margin: auto}
+
+.check_gray{width:24px;background: url(./image/check_gray_2.png);background-size: 24px 24px;background-repeat: no-repeat; background-position: 50% 4px}
+.error_gray{width:24px;background: url(./image/error_gray_2.png);background-size: 24px 24px;background-repeat: no-repeat; background-position: 50% 4px}
+.check_green{width:24px;background: url(./image/check_green_2.png);background-size: 24px 24px;background-repeat: no-repeat; background-position: 50% 4px}
+.error_green{width:24px;background: url(./image/error_red_2.png);background-size: 24px 24px;background-repeat: no-repeat; background-position: 50% 4px}
+.status_img_upper{position:absolute;width:24px;height:9px;top:0px;left:12px;z-index:100;background: #ffffff}
+.status_img_down{position:absolute;width:24px;height:20px;top:33px;left:12px;z-index:100;background: #ffffff}
+
+.status_desc{width: 80%;height: auto;padding-top: 7px;margin-left: 4%}
+.status_desc_title{font-size: 0.875em;line-height: 1.275em}
+.status_desc_sub{margin-top: 0.9375em;font-size: 0.7875em;color: #939393}
+.refund_note{color:blue;border-bottom: blue}
+
+.txt_gray{color:#b8b0b0}
+
+.dialog-wrap, .dialog { display:none; } 
+.dialog-wrap { position:absolute; top:0px; left:0px; width:100%; z-index:102; background:#000;height: 100%} 
+.dialog { border:10px;background:url(image/popup_1.png) no-repeat;z-index:199;position:fixed;position:absolute;width:266px;height:313px;top:50%;left:50%;margin:-156px 0px 0px -133px;border-radius:10px;text-align:left;background-size: 100% 100%}
+.dialog .contents-box { position:relative; width:100%; height:100% }
+.dialog .close { position:absolute; width:18px; height:18px; top:8px; right:8px; z-index:205; }
+.dialog .close a{display:block; width:100%; height:100%; }
+.dialog .contents {position:absolute; width:92%; height:100%;top:155px;left:4%;right:4%}
+.dialog .contents .title{display:block; width:100%; height:30px;text-align: center;font-size: 1.2em;color:#000000;line-height: 1.3em}
+.dialog .contents .desc{display:block; width:100%;text-align: center;font-size: 0.9em;color:#666666;line-height: 0.9em;margin-top: 3px;line-height: 20px}
+#grub_succ_count{color:#4b8bd8}
+.dialog .options {position:absolute;width:100%;bottom:20px;height:30px}
+.dialog .options .left{display: block;float:left;margin-left:10px;width:115px;height:1.5em;font-size: 1.0em;text-align: center;border: 1px #cecdcd solid;border-radius: 3px;padding: 6px 0 6px 0;color:#666666;line-height: 1.5em}
+.dialog .options .left:active{background-color: #e3e3e3}
+.dialog .options .right{display: block;float:right;margin-right:10px;width:115px;height:1.5em;border-radius: 3px;background-color: #4b8bd8;color:#ffffff;font-size: 1.0em;text-align: center;padding: 7px 0 7px 0;line-height: 1.5em}
+.dialog .options .right:active{background-color: #316db7}
+.dialog .options .single{display: block;margin:0 auto 0 auto;width:238px;height:1.5em;border-radius: 3px;background-color: #4b8bd8;color:#ffffff;font-size: 1.0em;text-align: center;padding: 7px 0 7px 0;line-height: 1.5em}
+.dialog .options .single:active{background-color: #316db7}
+
+.ticket_info{padding: 0 3% 0 3%;width: 94%;height: 3em;float:left;line-height: 2em;display: -webkit-box;display: -moz-box;display: box;position: relative;background-image: url(./image/arrow_right.png);background-repeat: no-repeat;background-position: 97% center;background-size: 7px 12px}
+.ticket_info_icon{background-image: url(image/train.png);background-position: 50% 50%;background-repeat: no-repeat;width: 24px;background-size: 23px 23px}
+.ticket_info_text{width: 80%;height: 3em;margin-left: 4%;line-height: 3em}
+.clickable{background: #FFFFFF;margin: auto;-webkit-tap-highlight-color: rgba(0,0,0,0);float:left;width:100%}
+.clickable:active{background: #d3d7dc;}
+
+.coupon_area{background: #ffffff;float:left;width: 94%;padding-right: 3%;padding-left: 3%}
+.coupon_txt{float:right;background: #FF5B45;color:#ffffff;font-size: 0.7em;padding: 0.2em 1em 0.4em 0.4em;border-radius: 0.35em;margin: 0.5em 0 0.3em 0;background-image: url(./image/arrow_white.png);background-repeat: no-repeat;background-position: 93% center;background-size: 6px 10px}
+.coupon_txt:active{background: #d98f85;background-image: url(./image/arrow_white.png);background-repeat: no-repeat;background-position: 93% center;background-size: 6px 10px}
+.coupon_txt_grey{float:right;background: #FF5B45;color:#ffffff;font-size: 0.7em;padding: 0.2em 1em 0.4em 0.4em;border-radius: 0.35em;margin: 0.5em 0 0.3em 0;background: #b3b3b3;background-image: url(./image/arrow_white.png);background-repeat: no-repeat;background-position: 93% center;background-size: 6px 10px}
+</style>
+<script type="text/javascript" src="../../js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="../js/native-api.js"></script>
+<script type="text/javascript" src="./js/native-address.js"></script>
+<script type="text/javascript" src="./js/native_grub_detail.js"></script>
+</head>
+<body>
+	<div style="background:#f3f3f3; float:left;width:100%" >
+		<div id="ticket_info">
+			<div id="train_info">
+				<font id="train_no"></font>
+				<font id="train_date"></font>
+			</div>
+			<div id="line_grub_train_info" style="display: none">
+				<font id="seat_types"></font>
+				<font id="depart_times"></font>
+			</div>
+			<div id="depart_arrive_info">
+				<div id="depart_info">
+					<font id="depart_city"></font>
+					<br/>
+					<font id="depart_time"></font>
+				</div>
+				<div id="arrive_info">
+					<font id="arrive_city"></font>
+					<br/>
+					<font id="arrive_time"></font>
+				</div>
+			</div>
+			<div id="passengers"></div>
+			<div id="coupon_area" class="coupon_area hidden_area">
+				<font class="coupon_txt" id="coupon_txt">已使用红包</font>
+			</div>
+			<div id="avs_divide" class="hidden_area" style="background: #ffffff;height:auto;float:left;width: 100%">
+				<div style="background: #ffffff;height: 5px;width: 100%;float: left"></div>
+				<div class="divide"></div>
+				<div style="background: #ffffff;height: 5px;width: 100%;float: left"></div>
+			</div>
+			<div id="grub_remain" class="hidden_area">
+				<font style="float:left;margin-left: 12px;color: #666666;font-size: 13px">停止时间</font>
+				<font id="txt_grub_remain" style="float:right;margin-right: 12px;font-size: 13px"></font>
+			</div>
+			<div id="grub_multi_train" class="hidden_area">
+				<font style="float:left;margin-left: 12px;color: #666666;font-size: 13px">备选车次</font>
+				<font id="txt_grub_multi_train" style="width:40%;text-align:right;float:right;margin-right: 12px;font-size: 13px;display:block;white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></font>
+			</div>
+			<div id="grub_insurance" class="hidden_area">
+				<font style="float:left;margin-left: 12px;color: #666666;font-size: 13px">已选套餐</font>
+				<font id="txt_grub_insurance" style="float:right;margin-right: 12px;font-size: 13px"></font>
+			</div>
+			<div id="grub_insurance_add_top" class="hidden_area" style="height: 5px;width: 100%;float:left;background: #ffffff"></div>
+			<div id="grub_insurance_add" class="hidden_area rise_up">
+				<dd id="txt_grub_insurance_add" class="rise_up_txt rise_up_img">当前排名第xxx名，可提升排名</dd>
+			</div>
+			<div id="ticket_info_end"></div>
+		</div>
+		<div class="divide_up"></div>
+	</div>
+	<div class="clickable hidden" id="view_12306_ticket">
+		<div class="ticket_info">
+			<div class="sub_status status_date_time"></div>
+			<div class="sub_status ticket_info_icon"></div>
+			<div class="sub_status ticket_info_text">12306车票订单</div>
+		</div>
+		<div style="height:1px;background: #eeeeee;width: 97%;float:left;margin-left: 3%"></div>
+	</div>
+	<div id="status"></div>
+	<div id="template_passenger" style="display:none">
+		<div class="passenger">
+			<div class="passenger_info">
+				<font class='passenger_name'>_passenger_name_<font class='passenger_type _child_' name="passenger_type">_passenger_type_</font></font><br/>
+				<font class='passenger_id'>_passenger_id_</font>
+			</div>
+			<div class="seat_info">
+				<font class='seat_type'>_seat_type_</font><br/>
+				<font class='seat_price'>_seat_price_</font>
+			</div>
+		</div>
+	</div>
+	<div id="template_status" style="display:none">
+	 	<div class="status">
+		 	<div class="_hidden_"></div>
+			<div class="sub_status status_date_time">
+			</div>
+			<div class="sub_status _status_style_"></div>
+			<div class="sub_status status_desc">
+				<d class="status_desc_title txt_gray">_status_desc__status_desc_plus_</d><br/>
+				<d class="status_date txt_gray">_status_date_ _status_time_</d><br/>
+			</div>
+		</div>
+	</div>
+	<div style="height:70px;float:left">&nbsp;</div>
+	<div id="submit_box" class="yellow hidden"></div>
+	<div id="share" class="yellow hidden"><font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;朋友圈嘚瑟去</font></div>
+	<div class="dialog-wrap"></div>
+	<div class="dialog" id="cancel_confirm">
+	    <div class="contents-box">
+	        <div class="close">
+	            <a title="关闭" href="javascript:GD.Dialog.Dismiss();" rel="external nofollow"></a>
+	        </div>
+	        <div class="contents">
+		        <font class="title">真的要说再见了吗？</font>
+		        <font class="desc">为您抢票，是我最大的荣幸<br/>今天坚持继续抢票成功人次：<font id="grub_succ_count"></font><br/>如果可以，再坚持一下，好吗？</font>
+	        </div>
+	        <div class="options">
+		        <a class="left">累觉不爱</a>
+		        <a class="right">继续抢票</a>
+	        </div>
+	    </div>
+	</div>
+	<div class="dialog" id="cancel_succ" style="border:10px;background:url(image/popup_2.png) no-repeat;z-index:199;position:fixed;position:absolute;width:266px;height:313px;top:50%;left:50%;margin:-156px 0px 0px -133px;border-radius:10px;text-align:left;background-size: 100% 100%">
+	    <div class="contents-box">
+	        <div class="close">
+	            <a title="关闭" href="javascript:GD.Dialog.Dismiss();" rel="external nofollow"></a>
+	        </div>
+	        <div class="contents">
+		        <font class="title" style="font-size: 0.9em;line-height: 1.1em">没我抢票的日子里，照顾好自己<br/>如果哪天回来，我依然在这里等你。</font>
+		        <font class="desc" style="margin-top: 20px">温馨提醒：退款实时到帐支付宝/微信，<br/>支付宝/微信退款到银行卡1-5个工作日。</font>
+	        </div>
+	        <div class="options">
+		        <a class="single">再见</a>
+	        </div>
+	    </div>
+	</div>
+</body>
+</html>

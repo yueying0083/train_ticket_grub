@@ -1,0 +1,57 @@
+<html>
+<head>
+<meta http-equiv="Access-Control-Allow-Origin" content="*">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>套餐选择</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="format-detection" content="telephone=no">
+<script type="text/javascript" src="../../js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="../js/native-api.js"></script>
+<script type="text/javascript" src="./js/native-address.js"></script>
+<script type="text/javascript" src="./js/native-grub-insurance.js"></script>
+<style>
+body{background:#f3f3f3; width: 100%;margin: 0 auto; font-family:Avenir; font-size: 1.1em;-webkit-user-select:none}
+*{color:#333333}
+.divide{background: #d3d7dc;height: 1px;width: 100%; overflow:hidden;}
+.divide_1{background: #d3d7dc;height: 1px;width: 96%; overflow:hidden;margin:0px 0px 0px auto}
+div.item{padding: 13px 4% 13px 4%; width: 92%}
+div.item:active{background: #d3d7dc}
+div.selected{background-image: url(./image/check.png);background-repeat: no-repeat;background-position: 97% center;background-size: 16px 11px;color:#4889db}
+div.selected:active{background-image: url(./image/check.png);background-repeat: no-repeat;background-position: 97% center;background-size: 16px 11px;color:#4889db}
+.main span, .main font{vertical-align: middle}
+.Level{ border-radius: 1em;color:#ffffff;padding: 2px 0.5em 2px 0.5em;font-size: 0.6em}
+.Green{background: #ff9f21}
+.Hidden{display: none}
+div.bill{padding: 13px 4% 13px 4%; width: 92%;background-image: url(./image/arrow_right.png);background-repeat: no-repeat;background-position: 97% center;background-size: 7px 12px}
+div.bill:active{background: #d3d7dc;background-image: url(./image/arrow_right.png);background-repeat: no-repeat;background-position: 97% center;background-size: 7px 12px}
+div.item div.main{line-height: 1.4em;}
+div.item div.main span{color: #FF9000}
+div.item div.sub{line-height: 1.2em;font-size: 0.9em;color: #989898;margin-left: 2px}
+
+p.tips{background-image: url(./image/star.png);background-position:0px 4px;background-repeat: no-repeat;padding-left: 15px;padding-right: 15px;font-size: 0.9em;color:#96969c;margin: 0px 0px 0px 3%;background-size: 8px 8px}
+
+.help{background-image: url(./image/help.png);background-repeat: no-repeat;background-position: 0px 0px;background-size: 18px 18px}
+.help:active{background-image: url(./image/help_p.png);background-repeat: no-repeat;background-position: 0px 0px;background-size: 18px 18px}
+</style>
+</head>
+<body>
+	<div style="padding: 8px 4% 8px 4%;font-size: 0.9em;background: #fcfcd7;color:#484938" id="notice">约<font id="grub_total_count" style="color:#f37800"></font>人正在排队抢票，建议购买套餐</div>
+	<div class="divide"></div>
+    <div id='insurances' style="margin-top:20px;background: #ffffff;width: 100%; float:left"></div>
+	<div style="float:left;width: 100%;margin-top: 20px">
+		<p class="tips"> 抢票不保证100%有票，但排队在前具有更多的服务资源，尽可能提升成功率；</p>
+		<p class="tips"> 排队顺序由套餐金额决定，同套餐则由付款时间决定，谢谢您的理解；</p>
+		<p class="tips" style="color : #f62020"> 抢票失败/超时，套餐全额退还。</p>
+	</div>
+    <div style="margin-top:20px;background: #ffffff;width: 100%; float:left;display: none" id="bill">
+    	<div class="divide"></div>
+    	<div class="bill">
+	        <span>套餐发票</span>
+	        <span id="address"></span>
+        </div>
+    	<div class="divide"></div>
+    </div>
+</body>
+</html>
